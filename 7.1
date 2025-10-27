@@ -1,0 +1,89 @@
+// Import JDBC packages
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+
+public class FetchEmployeeData {
+    public static void main(String[] args) {
+        // Database credentials
+        String url = "jdbc:mysql://localhost:3306/your_database_name"; // replace with your DB name
+        String username = "root";   // replace with your MySQL username
+        String password = "your_password"; // replace with your MySQL password
+
+        // JDBC objects
+        Connection conn = null;
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Step 1: Load the MySQL JDBC driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("MySQL JDBC Driver Registered!");
+
+            // Step 2: Establish connection
+            conn = DriverManager.getConnection(url, username, password);
+            System.out.println("Connected to the database!");
+
+            // Step 3: Create a statement object
+            stmt = conn.createStatement();
+
+            // Step 4: Execute the SQL query
+            String sql = "SELECT EmpID, Name, Salary FROM Employee";
+            rs = stmt.executeQuery(sql);
+
+            // Step 5: Display the results
+            System.out.println("Employee Details:");
+            System.out.println("-------------------------------------");
+            while (rs.next()) {
+                int id = rs.getInt("EmpID");
+                String name = rs.getString("Name");
+                double salary = rs.getDouble("Salary");
+
+                System.out.println("EmpID: " + id + ", Name: " + name + ", Salary: " + salary);
+            }
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("MySQL JDBC Driver not found!");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Database connection or query error!");
+            e.printStackTrace();
+        } finally {
+            // Step 6: Close all resources
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+-----------------------------------------------------------------------
+
+Create a database and table:--------------
+
+CREATE DATABASE your_database_name;
+USE your_database_name;
+CREATE TABLE Employee (
+    EmpID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Salary DOUBLE
+);
+INSERT INTO Employee VALUES (101, 'John Doe', 55000), (102, 'Jane Smith', 62000);
+------------------------------------------------------------------------
+Compile and run the Java file:-----------
+javac FetchEmployeeData.java
+java FetchEmployeeData
+------------------------------------------------------------------------
+OUTPUT:---------------------------------
+
+MySQL JDBC Driver Registered!
+Connected to the database!
+Employee Details:
+-------------------------------------
+EmpID: 101, Name: John Doe, Salary: 55000.0
+EmpID: 102, Name: Jane Smith, Salary: 62000.0
